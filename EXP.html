@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Book Haven — Online Bookstore</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+  />
+  <style>
+    /*— reset & root —*/
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@100;300;400;500;600&display=swap');
+    :root { --color: #4a2e0f; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; transition: .2s; }
+    html { font-size: 62.5%; overflow-x: hidden; scroll-behavior: smooth; }
+    body { background: #fff; }
+
+    /*— buttons —*/
+    .btn {
+      display: inline-block; margin-top: 1rem;
+      padding: .8rem 3rem; background: var(--color); color: #fff; font-size: 1.7rem;
+      cursor: pointer; box-shadow: 0 .5rem 1rem rgba(0,0,0,.1); border: .1rem solid rgba(0,0,0,.1);
+      text-transform: uppercase;
+    }
+    .btn:hover { background: #222; }
+
+    /*— header —*/
+    .header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+      background: var(--color); display: flex; align-items: center; justify-content: space-between;
+      padding: 2rem 5%; box-shadow: 0 .5rem 1rem rgba(0,0,0,.1);
+    }
+    .logo { color: #fff; font-size: 2.5rem; font-weight: 600; text-decoration: none; }
+    .navbar a { color: #fff; font-size: 1.7rem; margin: 0 1rem; text-decoration: none; }
+    .navbar a:hover { color: #ccc; }
+    .icons .fas { color: #fff; font-size: 2.5rem; margin-left: 1.7rem; cursor: pointer; }
+    .hamburger { display: none; cursor: pointer; flex-direction: column; }
+    .hamburger .line { width: 25px; height: 3px; background: #fff; margin: 3px 0; }
+
+    /*— home slider —*/
+    .home { padding-top: 14rem; position: relative; background: #f5f5f5; }
+    .slides-container { position: relative; overflow: hidden; }
+    .slide { display: none; align-items: center; padding: 3rem 5%; gap: 2rem; }
+    .slide.active { display: flex; }
+    .slide .content { flex:1; }
+    .slide .content span { font-size:2.5rem; color:#333; }
+    .slide .content h3 { font-size:5rem; color:var(--color); margin:1rem 0; }
+    .slide .content .btn { margin-top:2rem; }
+    .slide .img { flex:1; text-align:center; }
+    .slide .img img { width:80%; box-shadow:0 .5rem 1rem rgba(0,0,0,.1); }
+    #prev-slide, #next-slide {
+      position:absolute; top:50%; transform:translateY(-50%);
+      font-size:2.5rem; color:#fff; background:var(--color);
+      width:5rem; height:5rem; line-height:5rem; text-align:center;
+      cursor:pointer; border:.1rem solid rgba(0,0,0,.1); box-shadow:0 .5rem 1rem rgba(0,0,0,.1);
+    }
+    #prev-slide { left:2rem; } #next-slide { right:2rem; }
+
+    /*— banner/categories/products/about/contact/footer —*/
+    section { padding:5rem 5%; }
+    .heading { text-align:center; padding:10rem 0 5rem; background:#fafafa; }
+    .heading h1 { font-size:4rem; color:var(--color); }
+
+    .banner-container, .category .box-container, .products .box-container, .contact .icons-container, .footer .box-container {
+      display:grid; gap:2rem;
+    }
+    .banner-container { grid-template-columns: repeat(auto-fit, minmax(30rem,1fr)); }
+    .banner { position:relative; overflow:hidden; }
+    .banner img { width:100%; height:100%; object-fit:cover; }
+    .banner .content { position:absolute; bottom:2rem; left:2rem; color:#fff; }
+    .banner .content span { font-size:1.8rem; }
+    .banner .content h3 { font-size:2.5rem; margin:1rem 0; }
+
+    .category .title, .products .title { display:flex; align-items:center; font-size:2.5rem; margin-bottom:2rem; }
+    .category .title span, .products .title span { color:var(--color); margin-left:.5rem; }
+    .category .box-container { grid-template-columns: repeat(auto-fit, minmax(16rem,1fr)); }
+    .category .box { text-align:center; padding:2rem; box-shadow:0 .5rem 1rem rgba(0,0,0,.1); }
+    .category .box img { width:100%; height:15rem; object-fit:cover; }
+    .category .box h3 { margin-top:1rem; font-size:2rem; color:#333; }
+
+    .products .box-container { grid-template-columns: repeat(auto-fit, minmax(25rem,1fr)); }
+    .products .box { position:relative; background:#fff; text-align:center; overflow:hidden; box-shadow:0 .5rem 1rem rgba(0,0,0,.1); }
+    .products .box .img { width:100%; height:20rem; overflow:hidden; }
+    .products .box .img img { width:100%; height:100%; object-fit:cover; }
+    .products .box .content { padding:2rem; }
+    .products .box .content h3 { font-size:2rem; color:#333; }
+    .products .box .content .price { font-size:1.8rem; color:var(--color); margin-top:1rem; }
+
+    .about { display:flex; flex-wrap:wrap; gap:2rem; align-items:center; }
+    .about .img, .about .content { flex:1 1 40rem; }
+    .about .content h3 { font-size:3rem; color:var(--color); margin-bottom:1rem; }
+    .about .content p { font-size:1.4rem; line-height:1.8; color:#333; margin-bottom:1.5rem; }
+
+    .contact .icons-container { grid-template-columns: repeat(auto-fit, minmax(25rem,1fr)); }
+    .contact .icons { text-align:center; padding:2rem; box-shadow:0 .5rem 1rem rgba(0,0,0,.1); }
+    .contact .icons i { font-size:3rem; color:var(--color); margin-bottom:1rem; }
+    .contact .icons h3 { font-size:2rem; margin-bottom:1rem; }
+    .contact .icons p { font-size:1.5rem; color:#333; }
+
+    .contact .row { display:flex; flex-wrap:wrap; gap:2rem; margin-top:3rem; }
+    .contact form { flex:1 1 40rem; padding:2rem; box-shadow:0 .5rem 1rem rgba(0,0,0,.1); }
+    .contact form h3 { font-size:2.5rem; margin-bottom:1.5rem; color:var(--color); }
+    .contact form .inputBox { display:flex; gap:1rem; flex-wrap:wrap; }
+    .contact form .inputBox .box, .contact form textarea {
+      width:100%; padding:1rem; font-size:1.6rem; border:.1rem solid rgba(0,0,0,.1); margin-bottom:1rem;
+    }
+    .contact form textarea { resize:none; height:15rem; }
+
+    .footer { background:var(--color); padding:5rem 5%; }
+    .footer .box-container { grid-template-columns: repeat(auto-fit, minmax(25rem,1fr)); }
+    .footer .box h3 { color:#fff; font-size:2.2rem; margin-bottom:1rem; }
+    .footer .box a, .footer .box p { display:block; color:#ddd; font-size:1.4rem; margin-bottom:.8rem; text-decoration:none; }
+    .footer .box a:hover { color:#fff; }
+
+    .credit { text-align:center; padding:2rem; font-size:1.8rem; background:#eee; }
+    .credit span { color:var(--color); font-weight:600; }
+    
+    /*— responsive —*/
+    @media(max-width:900px){
+      .navbar { display:none; position:absolute; top:70px; left:0; width:100%; background:var(--color); flex-direction:column; }
+      .navbar.active { display:flex; }
+      .icons { display:none; }
+      .hamburger { display:flex; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- header -->
+  <header class="header">
+    <a href="#" class="logo">Page Turner</a>
+    <nav class="navbar">
+      <a href="#home">Home</a>
+      <a href="#shop">Shop</a>
+      <a href="#genres">Genres</a>
+      <a href="#about">About</a>
+      <a href="#contact">Contact</a>
+    </nav>
+    <div class="icons">
+      <div id="menu-btn" class="fas fa-bars"></div>
+    </div>
+    <div class="hamburger" id="hamburger">
+      <div class="line"></div>
+      <div class="line"></div>
+      <div class="line"></div>
+    </div>
+  </header>
+
+  <!-- home slider -->
+  <section class="home" id="home">
+    <div class="slides-container">
+      <div class="slide active">
+        <div class="content">
+          <span></span>
+          <h3>Room on the Roof</h3>
+          <a href="#" class="btn">Shop Now</a>
+        </div>
+        <div class="img">
+          <img src="https://m.media-amazon.com/images/I/81kvQ92hrcL.jpg" alt="by ruskin bond">
+        </div>
+      </div>
+      <div class="slide">
+        <div class="content">
+          <span>Quotations from Mao</span>
+          <h3>Historical Insights</h3>
+          <a href="#" class="btn">Shop Now</a>
+        </div>
+        <div class="img">
+          <img src="https://images.penguinrandomhouse.com/cover/9780140445136" alt="Quotations from Mao">
+        </div>
+      </div>
+      <div class="slide">
+        <div class="content">
+          <span>Harry Potter Series</span>
+          <h3>Magic &amp; Adventure</h3>
+          <a href="#" class="btn">Shop Now</a>
+        </div>
+        <div class="img">
+          <img src="https://images-na.ssl-images-amazon.com/images/I/81iqZ2HHD-L.jpg" alt="Harry Potter">
+        </div>
+      </div>
+      <div class="slide">
+        <div class="content">
+          <span>The Lord of the Rings</span>
+          <h3>Epic Fantasy</h3>
+          <a href="#" class="btn">Shop Now</a>
+        </div>
+        <div class="img">
+          <img src="https://images-na.ssl-images-amazon.com/images/I/91SZSW8qSsL.jpg" alt="LOTR">
+        </div>
+      </div>
+      <div class="slide">
+        <div class="content">
+          <span>The Alchemist</span>
+          <h3>Inspirational Journey</h3>
+          <a href="#" class="btn">Shop Now</a>
+        </div>
+        <div class="img">
+          <img src="https://images-na.ssl-images-amazon.com/images/I/71aFt4+OTOL.jpg" alt="The Alchemist">
+        </div>
+      </div>
+      <div class="slide">
+        <div class="content">
+          <span>Shiva Trilogy</span>
+          <h3>Thrilling Mystery</h3>
+          <a href="#" class="btn">Shop Now</a>
+        </div>
+        <div class="img">
+          <img src="https://www.clankart.com/user-uploads/isbn/9789380658742.jpg" alt="Shiva Trilogy">
+        </div>
+      </div>
+      <div class="slide">
+        <div class="content">
+          <span>Twilight Saga</span>
+          <h3>Romantic Fantasy</h3>
+          <a href="#" class="btn">Shop Now</a>
+        </div>
+        <div class="img">
+          <img src="https://images-na.ssl-images-amazon.com/images/I/71tbalAHYCL.jpg" alt="Twilight">
+        </div>
+      </div>
+    </div>
+    <div id="prev-slide" class="fas fa-angle-left" onclick="prev()"></div>
+    <div id="next-slide" class="fas fa-angle-right" onclick="next()"></div>
+  </section>
+
+  <!-- banner -->
+  <section class="banner-container" id="genres">
+    <div class="banner">
+      <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?&auto=format&fit=crop&w=600&q=60" alt="Classics">
+      <div class="content">
+        <span>Classics</span>
+        <h3>Timeless Reads</h3>
+        <a href="#shop" class="btn">Explore</a>
+      </div>
+    </div>
+    <div class="banner">
+      <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?&auto=format&fit=crop&w=600&q=60" alt="Fantasy">
+      <div class="content">
+        <span>Fantasy</span>
+        <h3>Magic & Myth</h3>
+        <a href="#shop" class="btn">Explore</a>
+      </div>
+    </div>
+    <div class="banner">
+      <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?&auto=format&fit=crop&w=600&q=60" alt="Mystery">
+      <div class="content">
+        <span>Mystery</span>
+        <h3>Whodunit</h3>
+        <a href="#shop" class="btn">Explore</a>
+      </div>
+    </div>
+    <div class="banner">
+      <img src="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?&auto=format&fit=crop&w=600&q=60" alt="Romance">
+      <div class="content">
+        <span>Romance</span>
+        <h3>Heartfelt Tales</h3>
+        <a href="#shop" class="btn">Explore</a>
+      </div>
+    </div>
+    <div class="banner">
+      <img src="https://images.unsplash.com/photo-1516979187457-637abb4f9353?&auto=format&fit=crop&w=600&q=60" alt="Historical">
+      <div class="content">
+        <span>Historical Fiction</span>
+        <h3>Past Reimagined</h3>
+        <a href="#shop" class="btn">Explore</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- products/shop -->
+  <section class="products" id="shop">
+    <h1 class="title">Featured <span>Books</span></h1>
+    <div class="box-container">
+      <!-- repeat for each book -->
+      <div class="box">
+        <div class="img">
+          <img src="https://www.scross.co.za/wp-content/uploads/2018/09/Leather-bound-bible.jpg" alt="The Bible"/>
+        </div>
+        <div class="content">
+          <h3>The Bible</h3>
+          <div class="price">$12.99</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="img">
+          <img src="https://images.penguinrandomhouse.com/cover/9780140445136" alt="Quotations from Mao"/>
+        </div>
+        <div class="content">
+          <h3>Quotations from Mao</h3>
+          <div class="price">$9.99</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="img">
+          <img src="https://images-na.ssl-images-amazon.com/images/I/81iqZ2HHD-L.jpg" alt="Harry Potter"/>
+        </div>
+        <div class="content">
+          <h3>Harry Potter Series</h3>
+          <div class="price">$59.99</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="img">
+          <img src="https://images-na.ssl-images-amazon.com/images/I/91SZSW8qSsL.jpg" alt="LOTR"/>
+        </div>
+        <div class="content">
+          <h3>The Lord of the Rings</h3>
+          <div class="price">$29.99</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="img">
+          <img src="https://images-na.ssl-images-amazon.com/images/I/71aFt4+OTOL.jpg" alt="The Alchemist"/>
+        </div>
+        <div class="content">
+          <h3>The Alchemist</h3>
+          <div class="price">$14.99</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="img">
+          <img src="https://images-na.ssl-images-amazon.com/images/I/81mX7wPhVWL.jpg" alt="Da Vinci Code"/>
+        </div>
+        <div class="content">
+          <h3>The Da Vinci Code</h3>
+          <div class="price">$11.99</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="img">
+          <img src="https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1720313229i/968.jpg" alt="Twilight"/>
+        </div>
+        <div class="content">
+          <h3>Twilight Saga</h3>
+          <div class="price">$19.99</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- about us -->
+  <section class="about" id="about">
+    <div class="img">
+      <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794?&auto=format&fit=crop&w=600&q=60" alt="About Us"/>
+    </div>
+    <div class="content">
+      <h3>About Book Haven</h3>
+      <p>Welcome to Book Haven, where every story finds its reader. From timeless classics to modern masterpieces, our passion is bringing you the best literature from across the globe. Whether you're seeking magic, mystery, romance, or historical adventure, our curated selection ensures there's something for every reader.</p>
+      <p>Our dedicated team partners with publishers and authors to bring you exclusive deals, rare editions, and the latest bestsellers. Join us in celebrating the written word—one page at a time.</p>
+      <a href="#" class="btn">Learn More</a>
+    </div>
+  </section>
+
+  <!-- contact -->
+  <section class="contact" id="contact">
+    <h1 class="heading"><span>Get in Touch</span></h1>
+    <div class="icons-container">
+      <div class="icons">
+        <i class="fas fa-phone"></i>
+        <h3>Phone</h3>
+        <p>+1 234 567 890</p>
+      </div>
+      <div class="icons">
+        <i class="fas fa-envelope"></i>
+        <h3>Email</h3>
+        <p>support@bookhaven.com</p>
+      </div>
+      <div class="icons">
+        <i class="fas fa-map-marker-alt"></i>
+        <h3>Address</h3>
+        <p>123 Book St, Novel City</p>
+      </div>
+    </div>
+    <div class="row">
+      <form>
+        <h3>Send a Message</h3>
+        <div class="inputBox">
+          <input type="text" placeholder="Your Name" class="box" />
+          <input type="email" placeholder="Your Email" class="box" />
+        </div>
+        <div class="inputBox">
+          <input type="text" placeholder="Subject" class="box" />
+          <input type="tel" placeholder="Phone Number" class="box" />
+        </div>
+        <textarea placeholder="Your Message" cols="30" rows="10"></textarea>
+        <input type="submit" value="Send Message" class="btn" />
+      </form>
+    </div>
+  </section>
+
+  <!-- footer -->
+  <section class="footer">
+    <div class="box-container">
+      <div class="box">
+        <h3>Quick Links</h3>
+        <a href="#home"><i class="fas fa-arrow-right"></i> Home</a>
+        <a href="#shop"><i class="fas fa-arrow-right"></i> Shop</a>
+        <a href="#genres"><i class="fas fa-arrow-right"></i> Genres</a>
+        <a href="#about"><i class="fas fa-arrow-right"></i> About</a>
+        <a href="#contact"><i class="fas fa-arrow-right"></i> Contact</a>
+      </div>
+      <div class="box">
+        <h3>Follow Us</h3>
+        <a href="#"><i class="fab fa-facebook-f"></i> Facebook</a>
+        <a href="#"><i class="fab fa-twitter"></i> Twitter</a>
+        <a href="#"><i class="fab fa-instagram"></i> Instagram</a>
+        <a href="#"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
+      </div>
+      <div class="box">
+        <h3>Newsletter</h3>
+        <p>Subscribe for the latest updates</p>
+        <form>
+          <input type="email" placeholder="Your Email" class="box" />
+          <input type="submit" value="Subscribe" class="btn"/>
+        </form>
+      </div>
+    </div>
+  </section>
+  <div class="credit">Created by <span>@BookHaven</span></div>
+
+  <!-- scripts -->
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const navbar = document.querySelector('.navbar');
+    hamburger.addEventListener('click', () => {
+      navbar.classList.toggle('active');
+    });
+    window.addEventListener('scroll', () => {
+      navbar.classList.remove('active');
+    });
+
+    const slides = document.querySelectorAll('.slide');
+    let index = 0;
+    function showSlide(i) {
+      slides[index].classList.remove('active');
+      index = (i + slides.length) % slides.length;
+      slides[index].classList.add('active');
+    }
+    function next() { showSlide(index + 1); }
+    function prev() { showSlide(index - 1); }
+  </script>
+
+</body>
+</html>
